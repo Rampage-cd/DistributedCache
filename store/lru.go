@@ -8,7 +8,7 @@ import(
 
 type lruCache struct{
 	mu sync.RWMutex
-	list *List.list
+	list *list.List
 	items map[string]*list.Element
 	expires map[string]time.Time	//存储的过期时间是一个时刻
 	maxBytes int64
@@ -28,7 +28,7 @@ type lruEntry struct{
 //新建实例函数（lruCache）
 func newLRUCache(opts Options) *lruCache{
 	//设置默认清理间隔时间（如果没有对应传入参数的话）
-	cleanupInterval := opts.cleanupInterval
+	cleanupInterval := opts.CleanupInterval
 	if cleanupInterval<=0{
 		cleanupInterval = time.Minute
 	}
@@ -37,9 +37,9 @@ func newLRUCache(opts Options) *lruCache{
 		list:	list.New(),
 		items:	make(map[string]*list.Element),
 		expires:	make(map[string]time.Time),
-		maxBytes:	opts.maxBytes,
+		maxBytes:	opts.MaxBytes,
 
-		onEvicted:	opts.onEvicted,
+		onEvicted:	opts.OnEvicted,
 		cleanupInterval:	cleanupInterval,
 		closeCh:	make(chan struct{}),
 	}
@@ -67,7 +67,7 @@ func (c *lruCache) Get(key string) (Value,bool){
 		c.mu.RUnlock()
 
 		//异步进行删除过期项，同时避免在读锁内操作（避免死锁）
-		go c.Delete()
+		go c.Delete(key)
 
 		return nil,false
 	}
@@ -181,13 +181,13 @@ func (c *lruCache) removeElement(elem *list.Element){
 	//所有操作需要考虑的四个量：items，expires，usedBytes，list
 	entry := elem.Value.(*lruEntry)
 
-	c.list.Delete(elem)
+	c.list.Remove(elem)
 	delete(c.items,entry.key)
 	delete(c.expires,entry.key)
-	c.usedBytes -= int64(len(entry.key) + len(entry.value))
+	c.usedBytes -= int64(len(entry.key) + entry.value.Len())
 
 	if c.onEvicted != nil{
-		c.onEvicted(entry.key,entry,value)
+		c.onEvicted(entry.key,entry.value)
 	}
 	//删除和清空操作需要考虑是否有回调
 }
@@ -196,7 +196,7 @@ func (c *lruCache) removeElement(elem *list.Element){
 func (c *lruCache) evict(){
 	//1.清理过期项
 	now := time.Now()
-	for key,expTime := range c.expirs{
+	for key,expTime := range c.expires{
 		if now.After(expTime){
 			if elem,ok := c.items[key]; ok{
 				c.removeElement(elem)
