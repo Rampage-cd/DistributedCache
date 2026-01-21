@@ -4,7 +4,7 @@ import(
 	"context"
 	"fmt"
 	"log"
-	"string"
+	"strings"
 	"sync"
 	"time"
 

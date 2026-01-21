@@ -190,7 +190,7 @@ func (g *Group) load(ctx context.Context,key string) (value ByteView,err error){
 }
 
 //3.实际加载数据的方法
-func (g *Group0) loadData(ctx context.Context,key string) (value ByteView,err error){
+func (g *Group) loadData(ctx context.Context,key string) (value ByteView,err error){
 	//尝试从远程节点获取
 	if g.peers != nil{
 		peer,ok,isSelf := g.peers.PickPeer(key)
@@ -220,7 +220,7 @@ func (g *Group0) loadData(ctx context.Context,key string) (value ByteView,err er
 func (g *Group) getFromPeer(ctx context.Context,peer Peer,key string) (ByteView,error){
 	bytes,err := peer.Get(g.name,key)
 	if err != nil{
-		return ByteView{},fmt.Errrof("failed to get from peer: %w",err)
+		return ByteView{},fmt.Errorf("failed to get from peer: %w",err)
 	}
 	return ByteView{b: bytes},nil
 }

@@ -78,7 +78,7 @@ func (c *Cache) ensureInitialized() {
 		//标记为已初始化
 		atomic.StoreInt32(&c.initialized,1)
 
-		logrus.Infof("Cache initialized with type %s,max bytes: %d",c.opts.CacheOptions,c.opts.MaxBytes)
+		logrus.Infof("Cache initialized with type %s,max bytes: %d",c.opts.CacheType,c.opts.MaxBytes)
 	}
 }
 
@@ -183,7 +183,7 @@ func (c *Cache) Clear(){
 
 	//重置统计信息
 	atomic.StoreInt64(&c.hits,0)
-	atomic.StoreInt64J(&c.misses,0)
+	atomic.StoreInt64(&c.misses,0)
 }
 
 //7.返回当前缓存项的数量
@@ -224,7 +224,6 @@ func (c *Cache) Close() {
 
 //9.返回缓存统计信息
 func (c *Cache) Stats() map[string]interface{} {//值的类型为interface，意味着值可以是任何类型
-	func (c *Cache) Stats() map[string]interface{} {
 	stats := map[string]interface{}{
 		"initialized": atomic.LoadInt32(&c.initialized) == 1,
 		"closed":      atomic.LoadInt32(&c.closed) == 1,
@@ -232,7 +231,7 @@ func (c *Cache) Stats() map[string]interface{} {//值的类型为interface，意
 		"misses":      atomic.LoadInt64(&c.misses),
 	}
 
-	if atomic.LoadInt32(&c.initialized) == 1 {//只有在已经初始化的情况下，才能统计缓存容量和命中率
+	if atomic.LoadInt32(&c.initialized) == 1 {
 		stats["size"] = c.Len()
 
 		// 计算命中率
@@ -245,7 +244,6 @@ func (c *Cache) Stats() map[string]interface{} {//值的类型为interface，意
 	}
 
 	return stats
-}
 }
 
 
