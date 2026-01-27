@@ -24,7 +24,7 @@ type PeerPicker interface{
 
 //Peer 定义了缓存节点的接口
 type Peer interface{
-	Get(group string,key string) ([]type,error)
+	Get(group string,key string) ([]byte,error)
 	Set(ctx context.Context,group string,key string,value []byte) error
 	Delete(group string,key string) (bool,error)
 	Close() error
@@ -102,7 +102,7 @@ func (p *ClientPicker) PrintPeers(){
 //2.startServiceDiscovery 启动服务发现
 func (p *ClientPicker) startServiceDiscovery() error{
 	//先进行全量更新
-	if err := p.fetchAllServices(); err := nil{
+	if err := p.fetchAllServices(); err != nil{
 		return err
 	}
 

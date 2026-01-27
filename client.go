@@ -43,9 +43,9 @@ func NewClient(addr string,svcName string,etcdCli *clientv3.Client) (*Client,err
 	conn, err := grpc.Dial(
 		addr,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),//不安全的传输（无TLS）
-		grpc.WithBlock()//Dial调用会阻塞，直到连接建立成功或失败
+		grpc.WithBlock(),//Dial调用会阻塞，直到连接建立成功或失败
 		grpc.WithTimeout(10*time.Second),//连接超时时间
-		grpc.WithDefaultCallOptions(grpc.WaitForReady(true))//RPC调用时，如果连接尚未就绪，会等待而不是立刻失败
+		grpc.WithDefaultCallOptions(grpc.WaitForReady(true)),//RPC调用时，如果连接尚未就绪，会等待而不是立刻失败
 	)
 	if err != nil{
 		return nil,fmt.Errorf("failed to dial server: %v",err)
@@ -90,7 +90,7 @@ func (c *Client) Delete(group,key string) (bool,error){
 	ctx,cancel := context.WithTimeout(context.Background(),3*time.Second)
 	defer cancel()
 
-	resp,err := c.grpcCli.Delete(ctx,&pb.RequestF{
+	resp,err := c.grpcCli.Delete(ctx,&pb.Request{
 		Group: group,
 		Key:	key,
 	})

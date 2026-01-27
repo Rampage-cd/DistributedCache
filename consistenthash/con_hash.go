@@ -19,7 +19,7 @@ type Map struct{
 	keys []int     //哈希环(存放哈希环上所有虚拟节点的哈希值)
 	hashMap map[int]string//哈希环到节点的映射（记录虚拟节点属于哪个真实节点）
 	nodeReplicas map[string]int//节点到虚拟节点数量的映射（记录真实节点有多少个虚拟节点）
-	nodeCounts map[string]int  //节点负载统计
+	nodeCounts map[string]int64 //节点负载统计
 	totalRequests int64			//总请求数
 }
 
@@ -41,6 +41,8 @@ func New(opts ...Option) *Map{
 }
 
 //Option 配置选项
+type Option func(*Map)
+
 func WithConfig(config *Config) Option{
 	return func(m *Map) {
 		m.config = config
@@ -85,7 +87,7 @@ func (m *Map) addNode(node string,replicas int){
 //3.移除节点
 func (m *Map) Remove(node string) error{
 	if node == ""{
-		return error.New("invalid node")
+		return errors.New("invalid node")
 	}
 
 	m.mu.Lock()
@@ -134,7 +136,7 @@ func (m *Map) Get(key string) string{
 	})
 
 	//处理边界情况
-	if idx == len(m.key){
+	if idx == len(m.keys){
 		idx = 0
 	}
 
