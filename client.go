@@ -1,15 +1,17 @@
 package mycache
 
-import(
+import (
 	"context"
 	"fmt"
 	"time"
-	"github.com/sirupsen/logrus"
+
 	pb "github.com/Rampage-cd/DistributedCache/pb"
+	"github.com/sirupsen/logrus"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
+
 //客户端的实现
 //通过gRPC与远端缓存节点通信，并可复用etcd客户端进行服务发现
 
@@ -20,7 +22,7 @@ type Client struct{
 	etcdCli *clientv3.Client
 	conn *grpc.ClientConn
 	grpcCli pb.MyCacheClient
-}
+}//实现了Peer接口
 
 //编译期接口断言（确保*Client实现了Peer接口）
 var _ Peer = (*Client)(nil)

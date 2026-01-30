@@ -351,7 +351,7 @@ func (g *Group) RegisterPeers(peers PeerPicker) {
 		panic("RegisterPeers called more than once")
 	}
 	g.peers = peers
-	logrus.Infof("[KamaCache] registered peers for group [%s]", g.name)
+	logrus.Infof("[MyCache] registered peers for group [%s]", g.name)
 }
 
 // Stats 返回缓存统计信息
